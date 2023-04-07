@@ -1,0 +1,21 @@
+[package]
+name = "rusty-graphs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+graph = "0.3.0"
+graphific = "0.1.1"
+graphlib = "0.6.3"
+pathfinding = "4.1.1"
+petgraph = "0.6.2"
+prepona = "0.1.0"
+
+gryf = { git = "https://github.com/pnevyk/gryf.git" }
+
+csv = "1.1.6"
+serde = { version = "1.0.151", features = ["derive"] }
+ordered-float = "3.4.0"
+num-traits = "0.2.15"
