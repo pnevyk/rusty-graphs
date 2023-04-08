@@ -420,7 +420,7 @@ let mut graph = Graph::new();
 we would get
 
 ```
-error[E0282]: type annotations needed for `gryf::Graph<i32, (), Ty, AdjList<i32, (), Ty, DefaultIndexing>>`
+error[E0282]: type annotations needed for `gryf::Graph<i32, (), Ty>`
  --> examples/gryf_hello.rs:4:9
   |
 4 |     let mut graph = Graph::new();
@@ -428,22 +428,19 @@ error[E0282]: type annotations needed for `gryf::Graph<i32, (), Ty, AdjList<i32,
   |
 help: consider giving `graph` an explicit type, where the type for type parameter `Ty` is specified
   |
-4 |     let mut graph: gryf::Graph<i32, (), Ty, AdjList<i32, (), Ty, DefaultIndexing>> = Graph::new();
-  |                  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+4 |     let mut graph: gryf::Graph<i32, (), Ty> = Graph::new();
+  |                  ++++++++++++++++++++++++++
 
 For more information about this error, try `rustc --explain E0282`.
 ```
 
-which is also a bit scary, mainly due to presence of `AdjList<i32, (), Ty,
-DefaultIndexing>`, which may be an unexpected parameter and which repeats all
-graph generic parameters vertex weight, edge weight and edge directionality.
 Nevertheless, it could be fixed by specifying the `Ty` generic parameter (as
-recommended by the error message) and only it:
+suggested by the error message) and only it:
 
 ```rust
 use gryf::core::marker::Undirected;
 
-let mut graph = Graph::<_, _, Undirected, _>::new();
+let mut graph = Graph::<_, _, Undirected>::new();
 ```
 
 ## Shortest paths
