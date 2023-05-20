@@ -1457,8 +1457,9 @@ std trait, it is also possible to collect such iterator into
 `petgraph` for example. If one wants to stick with the lazy iterator semantics,
 the `Result` item type makes the usage a little bit awkward. If the graph is
 guaranteed to be acyclic, the experience can be improved by adding
-`.map(Result::unwrap)` just after `run()`. The cycle error does not contain
-(yet) any information on where the cycle is.
+`.map(Result::unwrap)` just after `run()`. The cycle error contains an edge that
+is part of the cycle. There is also a helper routine to collect all edges of
+that cycle.
 
 ## Conclusion
 
