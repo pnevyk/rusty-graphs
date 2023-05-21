@@ -28,7 +28,7 @@ fn main() {
 
     let sorted = TopoSort::on(&graph)
         .run()
-        .map(|r| r.map(|v| graph.vertex(v).unwrap().name.as_str()))
+        .map(|r| r.map(|v| graph[v].name.as_str()))
         .collect::<Result<Vec<_>, _>>()
         .unwrap();
 
