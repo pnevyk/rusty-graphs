@@ -388,7 +388,7 @@ use neither `add_vertex` nor `add_edge`, which are essential for graph building.
 [source](examples/gryf_hello.rs)
 
 ```rust
-use gryf::prelude::*;
+use gryf::graph::Graph;
 
 let mut graph = Graph::new_undirected();
 
@@ -987,9 +987,12 @@ vertices = 17695
 [source](examples/gryf_dijkstra.rs)
 
 ```rust
-use gryf::algo::ShortestPaths;
-use gryf::core::index::VertexIndex;
-use gryf::prelude::*;
+use gryf::{
+    algo::ShortestPaths,
+    core::id::{IdType, VertexId},
+    graph::Graph,
+    prelude::*,
+};
 
 let cities = load_cities();
 
@@ -1006,12 +1009,12 @@ graph.connect_vertices(|src, dst| src.are_connected(dst));
 println!("edges = {}", graph.edge_count());
 
 let (start, target) = graph.vertices().fold(
-    (VertexIndex::null(), VertexIndex::null()),
+    (VertexId::sentinel(), VertexId::sentinel()),
     |(start, target), v| {
-        if v.data().name == START {
-            (*v.index(), target)
-        } else if v.data().name == TARGET {
-            (start, *v.index())
+        if v.attr().name == rusty_graphs::DIJKSTRA_START {
+            (*v.id(), target)
+        } else if v.attr().name == rusty_graphs::DIJKSTRA_TARGET {
+            (start, *v.id())
         } else {
             (start, target)
         }
@@ -1061,7 +1064,7 @@ wanted or necessary) to get the solution of their problem.
 The algorithm returns `Result<ShortestPaths, ...>`. Thus, encountered errors can
 be handled in a graceful manner. The type provides `dist` method to get a
 distance to a vertex, and `reconstruct` to get an iterator of vertices on the
-shortest path. It also implements `Index` trait as a shortcut for `dist` (but
+shortest path. It also implements `IdType` trait as a shortcut for `dist` (but
 panicking on `None`).
 
 ## Topological order
@@ -1415,8 +1418,7 @@ Topological order is not available in `graphific`.
 [source](examples/gryf_toposort.rs)
 
 ```rust
-use gryf::algo::TopoSort;
-use gryf::prelude::*;
+use gryf::{algo::TopoSort, graph::Graph};
 
 let packages = load_tree();
 

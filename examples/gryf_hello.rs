@@ -1,4 +1,4 @@
-use gryf::prelude::*;
+use gryf::graph::Graph;
 
 fn main() {
     let mut graph = Graph::new_undirected();

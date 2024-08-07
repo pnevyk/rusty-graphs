@@ -1,8 +1,11 @@
 use std::time::Instant;
 
-use gryf::algo::ShortestPaths;
-use gryf::core::index::VertexIndex;
-use gryf::prelude::*;
+use gryf::{
+    algo::ShortestPaths,
+    core::id::{IdType, VertexId},
+    graph::Graph,
+    prelude::*,
+};
 
 fn main() {
     let cities = rusty_graphs::load_cities();
@@ -28,12 +31,12 @@ fn main() {
     let started = Instant::now();
 
     let (start, target) = graph.vertices().fold(
-        (VertexIndex::null(), VertexIndex::null()),
+        (VertexId::sentinel(), VertexId::sentinel()),
         |(start, target), v| {
-            if v.data().name == rusty_graphs::DIJKSTRA_START {
-                (*v.index(), target)
-            } else if v.data().name == rusty_graphs::DIJKSTRA_TARGET {
-                (start, *v.index())
+            if v.attr().name == rusty_graphs::DIJKSTRA_START {
+                (*v.id(), target)
+            } else if v.attr().name == rusty_graphs::DIJKSTRA_TARGET {
+                (start, *v.id())
             } else {
                 (start, target)
             }

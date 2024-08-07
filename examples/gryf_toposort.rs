@@ -1,7 +1,6 @@
 use std::time::Instant;
 
-use gryf::algo::TopoSort;
-use gryf::prelude::*;
+use gryf::{algo::TopoSort, graph::Graph};
 
 fn main() {
     let packages = rusty_graphs::load_tree();

@@ -13,9 +13,9 @@ pathfinding = "4.1.1"
 petgraph = "0.6.2"
 prepona = "0.1.0"
 
-gryf = { git = "https://github.com/pnevyk/gryf.git" }
+gryf = { git = "https://github.com/pnevyk/gryf.git", rev = "bd61f04" }
 
 csv = "1.1.6"
-serde = { version = "1.0.151", features = ["derive"] }
+serde = { version = "1.0.204", features = ["derive"] }
 ordered-float = "3.4.0"
 num-traits = "0.2.15"
