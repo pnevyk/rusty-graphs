@@ -1064,8 +1064,9 @@ wanted or necessary) to get the solution of their problem.
 The algorithm returns `Result<ShortestPaths, ...>`. Thus, encountered errors can
 be handled in a graceful manner. The type provides `dist` method to get a
 distance to a vertex, and `reconstruct` to get an iterator of vertices on the
-shortest path. It also implements `IdType` trait as a shortcut for `dist` (but
-panicking on `None`).
+shortest path. It also implements
+[`Index`](https://doc.rust-lang.org/stable/std/ops/trait.Index.html) trait as a
+shortcut for `dist` (but panicking on `None`).
 
 ## Topological order
 
