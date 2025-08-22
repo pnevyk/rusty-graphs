@@ -2,9 +2,11 @@ use std::time::Instant;
 
 use gryf::{
     algo::ShortestPaths,
-    core::id::{IdType, VertexId},
-    graph::Graph,
-    prelude::*,
+    core::{
+        base::VertexReference,
+        id::{IdType, VertexId},
+    },
+    Graph,
 };
 
 fn main() {

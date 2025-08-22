@@ -388,7 +388,7 @@ use neither `add_vertex` nor `add_edge`, which are essential for graph building.
 [source](examples/gryf_hello.rs)
 
 ```rust
-use gryf::graph::Graph;
+use gryf::Graph;
 
 let mut graph = Graph::new_undirected();
 
@@ -420,22 +420,33 @@ let mut graph = Graph::new();
 we would get
 
 ```
-error[E0282]: type annotations needed for `gryf::Graph<i32, (), Ty>`
- --> examples/gryf_hello.rs:4:9
-  |
-4 |     let mut graph = Graph::new();
-  |         ^^^^^^^^^
-  |
+error[E0283]: type annotations needed for `Graph<i32, (), _>`
+  --> examples/gryf_hello.rs:4:9
+   |
+4  |     let mut graph = Graph::new();
+   |         ^^^^^^^^^   ----- type must be known at this point
+   |
+   = note: cannot satisfy `_: EdgeType`
+   = help: the following types implement trait `EdgeType`:
+             Directed
+             Undirected
+note: required by a bound in `Graph`
+  --> path/to/home/.cargo/git/checkouts/gryf-bf632e384a490b51/5d090d0/gryf/src/domain/generic.rs:69:28
+   |
+69 | pub struct Graph<V, E, Ty: EdgeType, G = AdjList<V, E, Ty, DefaultId>> {
+   |                            ^^^^^^^^ required by this bound in `Graph`
 help: consider giving `graph` an explicit type, where the type for type parameter `Ty` is specified
-  |
-4 |     let mut graph: gryf::Graph<i32, (), Ty> = Graph::new();
-  |                  ++++++++++++++++++++++++++
+   |
+4  |     let mut graph: Graph<_, _, Ty, AdjList<_, _, Ty, _>> = Graph::new();
+   |                  +++++++++++++++++++++++++++++++++++++++
 
-For more information about this error, try `rustc --explain E0282`.
+For more information about this error, try `rustc --explain E0283`.
+error: could not compile `rusty-graphs` (example "gryf_hello") due to 1 previous error
+
 ```
 
-Nevertheless, it could be fixed by specifying the `Ty` generic parameter (as
-suggested by the error message) and only it:
+Nevertheless, it could be fixed by specifying the `EdgeType` generic parameter (as
+somewhat suggested by the error message) and only it:
 
 ```rust
 use gryf::core::marker::Undirected;
@@ -989,9 +1000,11 @@ vertices = 17695
 ```rust
 use gryf::{
     algo::ShortestPaths,
-    core::id::{IdType, VertexId},
-    graph::Graph,
-    prelude::*,
+    core::{
+        base::VertexReference,
+        id::{IdType, VertexId},
+    },
+    Graph,
 };
 
 let cities = load_cities();
@@ -1419,7 +1432,7 @@ Topological order is not available in `graphific`.
 [source](examples/gryf_toposort.rs)
 
 ```rust
-use gryf::{algo::TopoSort, graph::Graph};
+use gryf::{algo::TopoSort, Graph};
 
 let packages = load_tree();
 
@@ -1457,12 +1470,13 @@ to react on a cycle. Thanks to the design of
 [`FromIterator`](https://doc.rust-lang.org/nightly/core/iter/trait.FromIterator.html#implementors)
 std trait, it is also possible to collect such iterator into
 `Result<Vec<VertexId>, Error>`, which effectively becomes the same API as in
-`petgraph` for example. If one wants to stick with the lazy iterator semantics,
-the `Result` item type makes the usage a little bit awkward. If the graph is
-guaranteed to be acyclic, the experience can be improved by adding
-`.map(Result::unwrap)` just after `run()`. The cycle error contains an edge that
-is part of the cycle. There is also a helper routine to collect all edges of
-that cycle.
+`petgraph` for example. Note that the `TopoSort` type actually provides the
+`into_vec` method that does exactly that. If one wants to stick with the lazy
+iterator semantics, the `Result` item type makes the usage a little bit awkward.
+If the graph is guaranteed to be acyclic, the experience can be improved by
+adding `.map(Result::unwrap)` just after `run()`. The cycle error contains an
+edge that is part of the cycle. There is also a helper routine to collect all
+edges of that cycle.
 
 ## Conclusion
 

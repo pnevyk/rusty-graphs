@@ -12,8 +12,7 @@ graphlib = "0.6.3"
 pathfinding = "4.1.1"
 petgraph = "0.6.2"
 prepona = "0.1.0"
-
-gryf = { git = "https://github.com/pnevyk/gryf.git", rev = "bd61f04" }
+gryf = "0.1.0"
 
 csv = "1.1.6"
 serde = { version = "1.0.204", features = ["derive"] }
