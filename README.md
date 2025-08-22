@@ -1,12 +1,10 @@
 # Comparing Rust graph libraries, while introducing [gryf](https://github.com/pnevyk/gryf)
 
-This is a collection of examples for showcasing various Rust graph data
-structure libraries. It is code heavy, with only little commentary. The main
-focus is put on the user experience. Performance is also considered, but without
-proper benchmarks. Aspects like completeness, correctness, documentation or
-usage and maintenance metrics are ignored whatsoever. Therefore, this document
-should _not_ be considered as a guide to what dependency for your project to
-choose.
+This is a collection of examples for showcasing various Rust graph data structure libraries.
+It is code heavy, with only little commentary. The main focus is put on the user experience.
+Performance is also considered, but without proper benchmarks.
+Aspects like completeness, correctness, documentation or usage and maintenance metrics are ignored whatsoever.
+Therefore, this document should _not_ be considered as a guide to what dependency for your project to choose.
 
 The list of libraries discussed here is the following<sup>1</sup>:
 
@@ -24,41 +22,29 @@ I tried to be fair, but parts of the commentary are subjective.
 **Disclaimer (maintenance):** I do _not_ plan to keep this document up-to-date.
 But I will accept PRs doing that.
 
-**Disclaimer (fairness):** There may be multiple ways how to achieve something
-in a library. If you think that an example can be improved, feel free to open a
-PR.
+**Disclaimer (fairness):** There may be multiple ways how to achieve something in a library.
+If you think that an example can be improved, feel free to open aPR.
 
-**Disclaimer (benchmarks):** All run times presented in this document are only
-orientational. They were _not_ collected in scientific manner. The examples were
-compiled in `--release` mode.
+**Disclaimer (benchmarks):** All run times presented in this document are only orientational.
+They were _not_ collected in scientific manner.
+The examples were compiled in `--release` mode.
 
-<sup>1</sup>If you know of some other, feel free to tell me about it in an issue
-or pull request.
+<sup>1</sup>If you know of some other, feel free to tell me about it in an issue or pull request.
 
 ## Exercises
 
 1. Recreate an example graph from [Wikipedia article](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)) (see below). [jump](#example-graph)
-2. Find [shortest paths](https://en.wikipedia.org/wiki/Shortest_path_problem)
-   from a vertex in a non-trivial graph (_n = ~17.5k_) of cities ([data
-   source](https://data.opendatasoft.com/explore/dataset/geonames-all-cities-with-a-population-1000%2540public/export/)),
-   where neighboring cities are connected via (hypothetical) air transport.
-   [jump](#shortest-paths)
-3. Get a [topologically
-   sorted](https://en.wikipedia.org/wiki/Topological_sorting) sequence of
-   vertices in a (`cargo tree`) dependency graph to get a (hypothetical) valid
-   compilation order. [jump](#topological-order)
+2. Find [shortest paths](https://en.wikipedia.org/wiki/Shortest_path_problem) from a vertex in a non-trivial graph (_n = ~17.5k_) of cities ([data source](https://data.opendatasoft.com/explore/dataset/geonames-all-cities-with-a-population-1000%2540public/export/)), where neighboring cities are connected via (hypothetical) air transport. [jump](#shortest-paths)
+3. Get a [topologically sorted](https://en.wikipedia.org/wiki/Topological_sorting) sequence of vertices in a (`cargo tree`) dependency graph to get a (hypothetical) valid compilation order. [jump](#topological-order)
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/6n-graf.svg/1920px-6n-graf.svg.png" alt="Example graph from Wikipedia" width="400" style="background: white;" />
 
-Vertices _V = { 1 , 2 , 3 , 4 , 5 , 6 }_ and edges _E = { { 1 , 2 } , { 1 , 5 } , { 2 , 3
-} , { 2 , 5 } , { 3 , 4 } , { 4 , 5 } , { 4 , 6 } }_.
+Vertices _V = { 1 , 2 , 3 , 4 , 5 , 6 }_ and edges _E = { { 1 , 2 } , { 1 , 5 } , { 2 , 3 } , { 2 , 5 } , { 3 , 4 } , { 4 , 5 } , { 4 , 6 } }_.
 
 ---
 
-I believe that the chosen exercises are to an extent realistic and not
-cherry-picked. Note that `graph` crate has a different focus and does not
-implement shortest paths and topological order algorithms at the time of the
-writing.
+I believe that the chosen exercises are to an extent realistic and not cherry-picked.
+Note that `graph` crate has a different focus and does not implement shortest paths and topological order algorithms at the time of the writing.
 
 ## Example graph
 
@@ -129,15 +115,11 @@ graph.extend_with_edges([
 
 (but the latter would require specifying the generic type of edge weight).
 
-I don't have a strong opinion on which alternative is the best. It is also
-better to discuss API for adding edges on a more realistic example.
+I don't have a strong opinion on which alternative is the best.
+It is also better to discuss API for adding edges on a more realistic example.
 
-`Graph::new_undirected()` creates an undirected graph, while `Graph::new()`
-would create a directed graph (there is not `new_directed` constructor).
-Defaulting to a graph variant (directed/undirected) when using common `new`
-constructor could lead to surprising behavior for a user not expecting this
-default, as I don't think there is a consensus on whether directed is more
-common than undirected or vice versa.
+`Graph::new_undirected()` creates an undirected graph, while `Graph::new()` would create a directed graph (there is not `new_directed` constructor).
+Defaulting to a graph variant (directed/undirected) when using common `new` constructor could lead to surprising behavior for a user not expecting this default, as I don't think there is a consensus on whether directed is more common than undirected or vice versa.
 
 ### Example graph in `prepona`
 
@@ -165,13 +147,10 @@ graph.add_edge(v4, v5, ().into()).unwrap();
 graph.add_edge(v4, v6, ().into()).unwrap();
 ```
 
-We see a separation of graph storage (`List`, aka [adjacency
-list](https://en.wikipedia.org/wiki/Adjacency_list)) and graph semantics
-(`SimpleGraph`, i.e. without parallel edges). What is unfortunate is that we are
-_required_ to make a choice, even if we don't care.
+We see a separation of graph storage (`List`, aka [adjacency list](https://en.wikipedia.org/wiki/Adjacency_list)) and graph semantics (`SimpleGraph`, i.e. without parallel edges).
+What is unfortunate is that we are _required_ to make a choice, even if we don't care.
 
-An interesting paper cut is the need for specifying the edge weight in this
-example (`List::<()>`). Without it, we get this compile error:
+An interesting paper cut is the need for specifying the edge weight in this example (`List::<()>`). Without it, we get this compile error:
 
 ```
 error[E0282]: type annotations needed for `SimpleGraph<(), DefaultEdge<()>, Dir, AdjList<(), DefaultEdge<()>, Dir>>`
@@ -188,23 +167,16 @@ help: consider giving `graph` an explicit type, where the type for type paramete
 For more information about this error, try `rustc --explain E0282`.
 ```
 
-It is interesting that according to the error message Rust can't infer `Dir`
-(directed vs undirected), not edge weight (first generic parameter of `List`).
-It is counter-intuitive to see that a possible (and likely the simplest) fix is
-to specify the edge weight.
+It is interesting that according to the error message Rust can't infer `Dir` (directed vs undirected), not edge weight (first generic parameter of `List`).
+It is counter-intuitive to see that a possible (and likely the simplest) fix is to specify the edge weight.
 
-The need for `into` in `().into()` is due to the fact that the graph holds `E:
-Edge<W>` instead of `W` directly, where `E` is a type that implements
-[`Edge`](https://docs.rs/prepona/0.1.0/prepona/prelude/trait.Edge.html) trait.
-This could be more ergonomic, as it looks like an unnecessary clutter, but not a
-big deal.
+The need for `into` in `().into()` is due to the fact that the graph holds `E: Edge<W>` instead of `W` directly, where `E` is a type that implements [`Edge`](https://docs.rs/prepona/0.1.0/prepona/prelude/trait.Edge.html) trait.
+This could be more ergonomic, as it looks like an unnecessary clutter, but not a big deal.
 
-Lastly, we can see that adding edge returns `Result`, hence the `unwrap`. This
-is reasonable, as there are cases when this operation can fail (non-existent
-vertex or already present edge for storages that do not support that). For
-comparison, `petgraph` panics if a duplicate edge is added to adjacency matrix
-graph. Ideally, there should be both a fallible and panicking method for such
-operations which allows the user to choose according to their preference.
+Lastly, we can see that adding edge returns `Result`, hence the `unwrap`.
+This is reasonable, as there are cases when this operation can fail (non-existent vertex or already present edge for storages that do not support that).
+For comparison, `petgraph` panics if a duplicate edge is added to adjacency matrix graph.
+Ideally, there should be both a fallible and panicking method for such operations which allows the user to choose according to their preference.
 
 ### Example graph in `pathfinding`
 
@@ -232,13 +204,9 @@ let graph = vec![
 ];
 ```
 
-`pathfinding` crate has a very different API than the rest, which is a good fit
-for graph-like data or [implicit
-graphs](https://en.wikipedia.org/wiki/Implicit_graph) without the need of
-storing it in a graph data structure. The graph representation is basically
-completely on the user, and the algorithms only ask for getting neighbors of a
-given vertex. Therefore, **this example is not ideal to showcase the crate's
-strengths**.
+`pathfinding` crate has a very different API than the rest, which is a good fit for graph-like data or [implicit graphs](https://en.wikipedia.org/wiki/Implicit_graph) without the need of storing it in a graph data structure.
+The graph representation is basically completely on the user, and the algorithms only ask for getting neighbors of a given vertex.
+Therefore, **this example is not ideal to showcase the crate's strengths**.
 
 ### Example graph in `graph`
 
@@ -253,28 +221,17 @@ let graph: UndirectedCsrGraph<usize, i32> = GraphBuilder::new()
     .build();
 ```
 
-`graph` crate uses the builder pattern for creating a graph (in fact, they have
-a dedicated crate
-[graph_builder](https://docs.rs/graph_builder/latest/graph_builder/) for it).
-The only required method is `edges`, which gets an iterable over pairs of vertex
-indices defining the graph structure. The vertex index type (first generic,
-required parameter) must implement `Idx` trait, which is implemented for all
-standard integer types. As the example graph has labels from 1 to 6, I also use
-`node_values` to specify the labels for the vertices (whose type is specified by
-the second generic parameter).
+`graph` crate uses the builder pattern for creating a graph (in fact, they have a dedicated crate [graph_builder](https://docs.rs/graph_builder/latest/graph_builder/) for it).
+The only required method is `edges`, which gets an iterable over pairs of vertex indices defining the graph structure.
+The vertex index type (first generic, required parameter) must implement `Idx` trait, which is implemented for all standard integer types.
+As the example graph has labels from 1 to 6, I also use `node_values` to specify the labels for the vertices (whose type is specified by the second generic parameter).
 
-The builder pattern does a good job on requiring only what is really necessary
--- the graph structure. Vertex and edge weights/labels, which are needed only on
-per case basis, are optional and do not clutter the code where unnecessary. Put
-it in contrast with `petgraph`, where we would need to use unit types in
-`graph.add_node(())` and `graph.add_edge(u, v, ())`.
+The builder pattern does a good job on requiring only what is really necessary -- the graph structure.
+Vertex and edge weights/labels, which are needed only on per case basis, are optional and do not clutter the code where unnecessary.
+Put it in contrast with `petgraph`, where we would need to use unit types in `graph.add_node(())` and `graph.add_edge(u, v, ())`.
 
-Because the
-[signature](https://docs.rs/graph_builder/0.3.1/graph_builder/builder/struct.GraphBuilder.html#method.build)
-of the `build` method is generic over the return type, has several variants and
-the type is where-constrained by `From<...>`, doing a slight mistake in typing
-ends up in quite an overwhelming error message. For example in our case, if we
-forgot to specify the node label type
+Because the [signature](https://docs.rs/graph_builder/0.3.1/graph_builder/builder/struct.GraphBuilder.html#method.build) of the `build` method is generic over the return type, has several variants and the type is where-constrained by `From<...>`, doing a slight mistake in typing ends up in quite an overwhelming error message.
+For example in our case, if we forgot to specify the node label type
 
 ```rust
 let graph: UndirectedCsrGraph<usize> = ...
@@ -335,15 +292,11 @@ graph.add_edge(&v4, &v5).unwrap();
 graph.add_edge(&v4, &v6).unwrap();
 ```
 
-This is very similar to what we have already seen. The only difference is that
-passing vertex index to `add_edge` is done by reference. Under the hoods, the
-vertex index is a 16-byte array, which is arguably unnecessarily large number
-space, but probably chosen to decrease risk of conflict for
-`VertexId::random()`.
+This is very similar to what we have already seen.
+The only difference is that passing vertex index to `add_edge` is done by reference.
+Under the hoods, the vertex index is a 16-byte array, which is arguably unnecessarily large number space, but probably chosen to decrease risk of conflict for `VertexId::random()`.
 
-One major disadvantage of `graphlib` is that -- at the time of writing -- it
-only supports directed graphs. The example code is therefore imprecise as the
-the goal was an undirected graph.
+One major disadvantage of `graphlib` is that -- at the time of writing -- it only supports directed graphs. The example code is therefore imprecise as the the goal was an undirected graph.
 
 ### Example graph in `graphific`
 
@@ -370,18 +323,13 @@ graph = graph.add_edge(Edge::new(3, 4)).unwrap();
 graph = graph.add_edge(Edge::new(3, 5)).unwrap();
 ```
 
-`graphific` takes a fundamentally different approach. Graph manipulation methods
-take `&self` and return new instance of accordingly modified graph, without
-mutating the original instance. It is essentially a [persistent data
-structure](https://en.wikipedia.org/wiki/Persistent_data_structure)
-implementation, although at the time of writing it simply clones the original
-instance, which is a massive performance hit for larger graphs.
+`graphific` takes a fundamentally different approach. Graph manipulation methods take `&self` and return new instance of accordingly modified graph, without mutating the original instance.
+It is essentially a [persistent data structure](https://en.wikipedia.org/wiki/Persistent_data_structure) implementation, although at the time of writing it simply clones the original instance, which is a massive performance hit for larger graphs.
 
-Another difference is explicit usage of a `Vertex` and `Edge` types that wrap
-corresponding weights. I am not sure about the advantages.
+Another difference is explicit usage of a `Vertex` and `Edge` types that wrap corresponding weights.
+I am not sure about the advantages.
 
-Unfortunate is the need for importing `AnyGraph` trait, without which we can't
-use neither `add_vertex` nor `add_edge`, which are essential for graph building.
+Unfortunate is the need for importing `AnyGraph` trait, without which we can't use neither `add_vertex` nor `add_edge`, which are essential for graph building.
 
 ### Example graph in `gryf`
 
@@ -408,10 +356,11 @@ graph.add_edge(v4, v5, ());
 graph.add_edge(v4, v6, ());
 ```
 
-Almost identical to `petgraph`. For both `add_vertex` and `add_edge` there
-exists a fallible `try_*` counterpart, which could be used if desired.
+Almost identical to `petgraph`. For both `add_vertex` and `add_edge` there exists a fallible `try_*` counterpart, which could be used if desired.
 
-`gryf` has both `new_undirected` and `new_directed` constructors. There is also the `new` constructor, which does not specify the directionality of edges. And so if we used it in our example
+`gryf` has both `new_undirected` and `new_directed` constructors.
+There is also the `new` constructor, which does not specify the directionality of edges.
+And so if we used it in our example
 
 ```rust
 let mut graph = Graph::new();
@@ -445,8 +394,7 @@ error: could not compile `rusty-graphs` (example "gryf_hello") due to 1 previous
 
 ```
 
-Nevertheless, it could be fixed by specifying the `EdgeType` generic parameter (as
-somewhat suggested by the error message) and only it:
+Nevertheless, it could be fixed by specifying the `EdgeType` generic parameter (as somewhat suggested by the error message) and only it:
 
 ```rust
 use gryf::core::marker::Undirected;
@@ -482,8 +430,7 @@ impl City {
 }
 ```
 
-Data downloaded from
-[here](https://data.opendatasoft.com/explore/dataset/geonames-all-cities-with-a-population-1000%2540public/export/).
+Data downloaded from [here](https://data.opendatasoft.com/explore/dataset/geonames-all-cities-with-a-population-1000%2540public/export/).
 
 #### Table of contents
 
@@ -564,32 +511,25 @@ dijkstra (with goal) took 31.75331ms
 distance = 12782.68
 ```
 
-For connecting the cities, we need to manually iterate over all pairs of
-vertices and add edges where the cities are connected according to our
-criterion. This is a pattern that we will see in most examples. We need to use a
-for loop with `usize` indices and create `NodeIndex` manually from them. This
-assumes that vertices are stored in contiguous order without gaps (which is
-reasonable to expect).
+For connecting the cities, we need to manually iterate over all pairs of vertices and add edges where the cities are connected according to our criterion.
+This is a pattern that we will see in most examples.
+We need to use a for loop with `usize` indices and create `NodeIndex` manually from them.
+This assumes that vertices are stored in contiguous order without gaps (which is reasonable to expect).
 
-For finding the start and target vertex indices we use `Iterator::fold` over
-vertex references. This is again a pattern that we will see in most examples.
-There might be a cleaner way, but for the purposes of this document it does not
-matter the most.
+For finding the start and target vertex indices we use `Iterator::fold` over vertex references.
+This is again a pattern that we will see in most examples.
+There might be a cleaner way, but for the purposes of this document it does not matter the most.
 
-Running the algorithm is done via calling `dijkstra` function. This approach
-requires to specify all parameters, including the goal vertex and edge weight
-function, even in cases when not needed (no goal) or where a reasonable default
-exists (the edge itself). The advantage of edge weight function is that it gets
-edge reference which also contains source and target indices. This allows to
-calculate the weight based on the vertices without the need of storing the
-weight during the graph creation.
+Running the algorithm is done via calling `dijkstra` function.
+This approach requires to specify all parameters, including the goal vertex and edge weight function, even in cases when not needed (no goal) or where a reasonable default exists (the edge itself).
+The advantage of edge weight function is that it gets edge reference which also contains source and target indices.
+This allows to calculate the weight based on the vertices without the need of storing the weight during the graph creation.
 
-The function returns `HashMap<NodeId, W>`. It is impossible to reconstruct the
-path.
+The function returns `HashMap<NodeId, W>`.
+It is impossible to reconstruct the path.
 
 There is no way how to indicate an error (e.g, when an edge weight is negative).
-In fact, the implementation at the time of writing does not detect that and
-returns potentially invalid output.
+In fact, the implementation at the time of writing does not detect that and returns potentially invalid output.
 
 ### Shortest paths in `prepona`
 
@@ -662,34 +602,25 @@ distance = 12782.68
 dijkstra (with goal) not available
 ```
 
-Fundamentally equivalent way how to construct the graph and get the start and
-target vertices. Vertex in `prepona` can't hold any data, so we need to index
-into the `cities` "database".
+Fundamentally equivalent way how to construct the graph and get the start and target vertices.
+Vertex in `prepona` can't hold any data, so we need to index into the `cities` "database".
 
-Running the algorithm consists of two steps: first the algorithm state is
-initialized (`init`) and then the algorithm is executed (`execute`). The
-advantages of this separation are not clear (to me). Moreover, it allows
-misusing the API by passing different (or modified) instances of a graph into
-each step, causing unspecified behavior. There is no way how to specify a goal
-vertex or use a custom edge weight calculation.
+Running the algorithm consists of two steps: first the algorithm state is initialized (`init`) and then the algorithm is executed (`execute`).
+The advantages of this separation are not clear (to me).
+Moreover, it allows misusing the API by passing different (or modified) instances of a graph into each step, causing unspecified behavior.
+There is no way how to specify a goal vertex or use a custom edge weight calculation.
 
-The algorithm returns `ShortestPathSubgraph`. This type provides a `distance_to`
-method. It could also provide a path reconstruction method, although it is not
-present at the time of writing. A new type allows to change internals without it
-being a breaking change.
+The algorithm returns `ShortestPathSubgraph`.
+This type provides a `distance_to` method.
+It could also provide a path reconstruction method, although it is not present at the time of writing.
+A new type allows to change internals without it being a breaking change.
 
-Working with floats is not very convenient. The bounds on the generic type
-requires the weight to implement both `std::cmp::Ord` and
-`num_traits::Unsigned`, which rules out standard floats (`f32`, `f64`) as well
-as common "ordered floats"
-([`ordered_float::OrderedFloat`](https://crates.io/crates/ordered-float),
-[`float_ord::FloatOrd`](https://crates.io/crates/float-ord)).
+Working with floats is not very convenient.
+The bounds on the generic type requires the weight to implement both `std::cmp::Ord` and `num_traits::Unsigned`, which rules out standard floats (`f32`, `f64`) as well as common "ordered floats" ([`ordered_float::OrderedFloat`](https://crates.io/crates/ordered-float), [`float_ord::FloatOrd`](https://crates.io/crates/float-ord)).
 
-Method `distance_to` returns `Option<Magnitude<W>>`. `Magnitude<W>` is an enum
-with `Finite(W)`, `PosInfinite` and `NegInfinite`, which seems unnecessary (as
-that should be encoded in `W` itself or as `None`) and creates the necessity to
-use double `unwrap`. The `get` call originates from using a custom type for
-unsigned float.
+Method `distance_to` returns `Option<Magnitude<W>>`.
+`Magnitude<W>` is an enum with `Finite(W)`, `PosInfinite` and `NegInfinite`, which seems unnecessary (as that should be encoded in `W` itself or as `None`) and creates the necessity to use double `unwrap`.
+The `get` call originates from using a custom type for unsigned float.
 
 ### Shortest paths in `pathfinding`
 
@@ -766,26 +697,19 @@ dijkstra (with goal) took 15.334814ms
 distance = 12782.68
 ```
 
-Again, due to a different approach to the API, we need to construct the graph of
-connections between the cities ourselves. Nevertheless, it is reasonably
-straightforward.
+Again, due to a different approach to the API, we need to construct the graph of connections between the cities ourselves.
+Nevertheless, it is reasonably straightforward.
 
-For running the algorithm, a function is called. There are two<sup>3</sup>
-variants: without a goal (`dijkstra_all`) and with a goal (`dijkstra`). The
-functions require the start vertex and a function returning an iterable over
-neighbors of given vertex along with the edge weights. We need to use
-[`ordered_float::OrderedFloat`](https://crates.io/crates/ordered-float) for the
-edge weight as the algorithm requires it to be `std::cmp::Ord`. The way of
-specifying the goal is more flexible than in `petgraph` as it is determined by a
-closure with custom logic instead of passing a vertex index.
+For running the algorithm, a function is called.
+There are two<sup>3</sup> variants: without a goal (`dijkstra_all`) and with a goal (`dijkstra`).
+The functions require the start vertex and a function returning an iterable over neighbors of given vertex along with the edge weights.
+We need to use [`ordered_float::OrderedFloat`](https://crates.io/crates/ordered-float) for the edge weight as the algorithm requires it to be `std::cmp::Ord`.
+The way of specifying the goal is more flexible than in `petgraph` as it is determined by a closure with custom logic instead of passing a vertex index.
 
-Functions `dijkstra_all` and `dijkstra` return `HashMap<Vertex, (Vertex, W)>`
-and `Option<(Vec<Vertex>, W)>`, respectively. Reconstructing the path can be
-done using `build_path` function, given that `dijkstra_partial` is used instead
-of `dijkstra`.
+Functions `dijkstra_all` and `dijkstra` return `HashMap<Vertex, (Vertex, W)>` and `Option<(Vec<Vertex>, W)>`, respectively.
+Reconstructing the path can be done using `build_path` function, given that `dijkstra_partial` is used instead of `dijkstra`.
 
-<sup>3</sup>Technically there is a third variant `dijkstra_partial`, but it is not
-important for our example.
+<sup>3</sup>Technically there is a third variant `dijkstra_partial`, but it is not important for our example.
 
 ### Shortest paths in `graph`
 
@@ -842,10 +766,9 @@ dijkstra (without goal) not available
 dijkstra (with goal) not available
 ```
 
-`graph` crate has different focus: high-performant algorithms on large (sparse)
-graphs. It does not provide an implementation of Dijkstra algorithm. For
-single-source shortest paths, there is `delta_stepping` function, which requires
-a directed graph and a `delta` parameter.
+`graph` crate has different focus: high-performant algorithms on large (sparse) graphs.
+It does not provide an implementation of Dijkstra algorithm.
+For single-source shortest paths, there is `delta_stepping` function, which requires a directed graph and a `delta` parameter.
 
 ### Shortest paths in `graphlib`
 
@@ -922,19 +845,17 @@ distance = 12782.681
 dijkstra (with goal) not available
 ```
 
-There are two inconveniences in `graphlib` for this example. First, it does not
-provide an implementation of undirected graph, thus we need to add every edge
-twice going forward and backward. Second, it requires the edge weights to be in
-range [0, 1].
+There are two inconveniences in `graphlib` for this example.
+First, it does not provide an implementation of undirected graph, thus we need to add every edge twice going forward and backward.
+Second, it requires the edge weights to be in range [0, 1].
 
-Running the algorithm is done via `Dijkstra::new` constructor. It does not allow
-to specify a goal or custom edge weight. The return type is `Result`, so that
-encountered errors can be handled in a graceful manner. There is possibility to
-recompute the distances from a new start using `set_source`.
+Running the algorithm is done via `Dijkstra::new` constructor.
+It does not allow to specify a goal or custom edge weight.
+The return type is `Result`, so that encountered errors can be handled in a graceful manner.
+There is possibility to recompute the distances from a new start using `set_source`.
 
 The type has `get_distance_to` and `get_path_to` (for path reconstruction).
-However, the former takes `&mut self` and the latter takes `self`, which are
-both somewhat unexpected and inconvenient choices.
+However, the former takes `&mut self` and the latter takes `self`, which are both somewhat unexpected and inconvenient choices.
 
 ### Shortest paths in `graphific`
 
@@ -1057,29 +978,20 @@ dijkstra (with goal) took 33.414195ms
 distance = 12782.68
 ```
 
-In `gryf`, there is a small quality-of-life improvement in the form of
-`connect_vertices` which allows to specify edges by a predicate that takes a
-pair of vertices and returns the weight or nothing.
+In `gryf`, there is a small quality-of-life improvement in the form of `connect_vertices` which allows to specify edges by a predicate that takes a pair of vertices and returns the weight or nothing.
 
-Running the algorithm is done via the builder pattern. It consists of
-initializing the builder for given graph, setting what should be set, and
-finally calling `run` with the start vertex (the only fundamentally required
-parameter). It is possible to specify the goal vertex with `goal` builder method
-or custom edge weight using `edge_weight_fn` builder method.
+Running the algorithm is done via the builder pattern.
+It consists of initializing the builder for given graph, setting what should be set, and finally calling `run` with the start vertex (the only fundamentally required parameter).
+It is possible to specify the goal vertex with `goal` builder method or custom edge weight using `edge_weight_fn` builder method.
 
-One important difference is that the builder is generically named
-`ShortestPaths`, without any reference to a specific algorithm. (Note: calling
-the `dijkstra` builder method is not technically necessary to get the result,
-but it forces to use the Dijkstra algorithm to be comparable with other
-libraries.) This allows the user not care about the underlying algorithm (unless
-wanted or necessary) to get the solution of their problem.
+One important difference is that the builder is generically named `ShortestPaths`, without any reference to a specific algorithm.
+(Note: calling the `dijkstra` builder method is not technically necessary to get the result, but it forces to use the Dijkstra algorithm to be comparable with other libraries.)
+This allows the user not care about the underlying algorithm (unless wanted or necessary) to get the solution of their problem.
 
-The algorithm returns `Result<ShortestPaths, ...>`. Thus, encountered errors can
-be handled in a graceful manner. The type provides `dist` method to get a
-distance to a vertex, and `reconstruct` to get an iterator of vertices on the
-shortest path. It also implements
-[`Index`](https://doc.rust-lang.org/stable/std/ops/trait.Index.html) trait as a
-shortcut for `dist` (but panicking on `None`).
+The algorithm returns `Result<ShortestPaths, ...>`.
+Thus, encountered errors can be handled in a graceful manner.
+The type provides `dist` method to get a distance to a vertex, and `reconstruct` to get an iterator of vertices on the shortest path.
+It also implements [`Index`](https://doc.rust-lang.org/stable/std/ops/trait.Index.html) trait as a shortcut for `dist` (but panicking on `None`).
 
 ## Topological order
 
@@ -1163,21 +1075,14 @@ edges = 200
 topological sort took 10.763µs
 ```
 
-Making the graph and running the algorithm is done the same way as in the
-shortest path example. The `toposort` function also accepts optional mutable
-reference to `DfsSpace`. As far as I understand it, its purpose is to reuse
-allocated stack and discovered set, so that there is no need for buffer
-reallocation if used on the same or only slightly changed graph. Using
-`language:rust path:*.rs /toposort\(.+,\s*Some\(/` query on GitHub gave me 4
-relevant code instances of using some space, from which just one was using it in
-the intended way. It is a good idea to be able to exploit some knowledge from
-the past to avoid unnecessary performance hits, but it seems that it isn't used
-widely but still adds clutter to the API.
+Making the graph and running the algorithm is done the same way as in the shortest path example.
+The `toposort` function also accepts optional mutable reference to `DfsSpace`.
+As far as I understand it, its purpose is to reuse allocated stack and discovered set, so that there is no need for buffer reallocation if used on the same or only slightly changed graph.
+Using `language:rust path:*.rs /toposort\(.+,\s*Some\(/` query on GitHub gave me 4 relevant code instances of using some space, from which just one was using it in the intended way.
+It is a good idea to be able to exploit some knowledge from the past to avoid unnecessary performance hits, but it seems that it isn't used widely but still adds clutter to the API.
 
-The function returns `Vec<NodeId>` if successful and `Cycle<NodeId>` if a cycle
-is detected. It is nice to have an information about where the cycle is,
-although it may be more useful to get an edge that participates in the cycle
-rather than just the vertex.
+The function returns `Vec<NodeId>` if successful and `Cycle<NodeId>` if a cycle is detected.
+It is nice to have an information about where the cycle is, although it may be more useful to get an edge that participates in the cycle rather than just the vertex.
 
 ### Topological order in `prepona`
 
@@ -1228,10 +1133,9 @@ edges = 200
 topological sort took 52.559µs
 ```
 
-The code is again very similar to the example for shortest path. The only
-interesting fact is that the algorithm does not return an error in case of
-cycle. In fact, the implementation at the time of writing does not detect
-cycles.
+The code is again very similar to the example for shortest path.
+The only interesting fact is that the algorithm does not return an error in case of cycle.
+In fact, the implementation at the time of writing does not detect cycles.
 
 ### Topological order in `pathfinding`
 
@@ -1273,9 +1177,9 @@ vertices = 106
 topological sort took 88.716µs
 ```
 
-For `pathfinding` we see again custom handling of graph storage. The API is
-consistent with the shortest path example. Similar to `petgraph`, the return
-type is `Vec<Vertex>` if successful and `Vertex` if a cycle is detected.
+For `pathfinding` we see again custom handling of graph storage.
+The API is consistent with the shortest path example.
+Similar to `petgraph`, the return type is `Vec<Vertex>` if successful and `Vertex` if a cycle is detected.
 
 ### Topological order in `graph`
 
@@ -1318,8 +1222,7 @@ edges = 200
 topological sort not available
 ```
 
-Again, for different focus of the crate, the implementation of topological order
-is not available.
+Again, for different focus of the crate, the implementation of topological order is not available.
 
 ### Topological order in `graphlib`
 
@@ -1371,15 +1274,12 @@ edges = 200
 topological sort took 19.083µs
 ```
 
-In `graphlib`, the `topo` method returns a custom type `Topo` which implements
-an iterator over vertex indices in topological order. Being lazy, it allows to
-take only subset of vertices if desired in the application without the need of
-finding a topological order between the rest of the vertices. This is a nice
-feature.
+In `graphlib`, the `topo` method returns a custom type `Topo` which implements an iterator over vertex indices in topological order.
+Being lazy, it allows to take only subset of vertices if desired in the application without the need of finding a topological order between the rest of the vertices.
+This is a nice feature.
 
-Unfortunately, the algorithm panics if it encounters a cycle. Or you could use
-`Topo::is_cyclic(&mut self) -> bool`, which exhausts the underlying iterator,
-and then call `topo` again.
+Unfortunately, the algorithm panics if it encounters a cycle.
+Or you could use `Topo::is_cyclic(&mut self) -> bool`, which exhausts the underlying iterator, and then call `topo` again.
 
 ### Topological order in `graphific`
 
@@ -1464,28 +1364,22 @@ edges = 200
 topological sort took 37.061µs
 ```
 
-In `gryf` a custom type is returned which implements iterator over
-`Result<VertexId, Error>`. This allows lazy behavior but still makes it possible
-to react on a cycle. Thanks to the design of
-[`FromIterator`](https://doc.rust-lang.org/nightly/core/iter/trait.FromIterator.html#implementors)
-std trait, it is also possible to collect such iterator into
-`Result<Vec<VertexId>, Error>`, which effectively becomes the same API as in
-`petgraph` for example. Note that the `TopoSort` type actually provides the
-`into_vec` method that does exactly that. If one wants to stick with the lazy
-iterator semantics, the `Result` item type makes the usage a little bit awkward.
-If the graph is guaranteed to be acyclic, the experience can be improved by
-adding `.map(Result::unwrap)` just after `run()`. The cycle error contains an
-edge that is part of the cycle. There is also a helper routine to collect all
-edges of that cycle.
+In `gryf` a custom type is returned which implements iterator over `Result<VertexId, Error>`.
+This allows lazy behavior but still makes it possible to react on a cycle.
+Thanks to the design of [`FromIterator`](https://doc.rust-lang.org/nightly/core/iter/trait.FromIterator.html#implementors) std trait, it is also possible to collect such iterator into `Result<Vec<VertexId>, Error>`, which effectively becomes the same API as in `petgraph` for example.
+Note that the `TopoSort` type actually provides the `into_vec` method that does exactly that.
+If one wants to stick with the lazy iterator semantics, the `Result` item type makes the usage a little bit awkward.
+If the graph is guaranteed to be acyclic, the experience can be improved by adding `.map(Result::unwrap)` just after `run()`.
+The cycle error contains an edge that is part of the cycle.
+There is also a helper routine to collect all edges of that cycle.
 
 ## Conclusion
 
-It's awesome to see that each crate has unique idea(s) and that one can take
-inspiration from, and so I did. Obviously, some libraries are developed more
-than others (which may be even abandoned). Different libraries have different
-design goals too.
+It's awesome to see that each crate has unique idea(s) and that one can take inspiration from, and so I did.
+Obviously, some libraries are developed more than others (which may be even abandoned).
+Different libraries have different design goals too.
 
-I am satisfied with how `gryf` "scores" in this comparison. There are definitely
-parts to refine and features to add, but I believe that the base is strong. Any
-feedback is very appreciated. And if you like what you see, contribution (be it
-code or just an idea) is welcome too of course.
+I am satisfied with how `gryf` "scores" in this comparison.
+There are definitely parts to refine and features to add, but I believe that the base is strong.
+Any feedback is very appreciated.
+And if you like what you see, contribution (be it code or just an idea) is welcome too of course.
